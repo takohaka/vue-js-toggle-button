@@ -7,10 +7,12 @@
          @change.stop="toggle">
   <span class="v-switch-core"
         :style="coreStyle"
-        :aria-checked="ariaChecked"></span>
+        :aria-checked="ariaChecked">
+    <span class="v-switch-control" :style="controlStyle"></span>
+  </span>
   <div v-if="labels">
-    <span class="v-switch-label v-left" v-if="toggled">{{labelChecked}}</span>
-    <span class="v-switch-label v-right" v-else>{{labelUnchecked}}</span>
+    <span class="v-switch-label v-left" :style="labelStyle" v-if="toggled">{{labelChecked}}</span>
+    <span class="v-switch-label v-right" :style="labelStyle" v-else>{{labelUnchecked}}</span>
   </div>
 </label>
 </template>
@@ -67,6 +69,10 @@ export default {
     width: {
       type: Number,
       default: 50
+    },
+    borderRadius: {
+      type: Number,
+      default: 999
     }
   },
   computed: {
@@ -79,18 +85,20 @@ export default {
       ]
     },
 
+    distance () {
+      return this.width - this.height + margin
+    },
+
     ariaChecked () {
       return this.toggled.toString()
     },
 
     style () {
       let { width, height } = this
-      let distance = width - height + margin
 
       return {
-        '--h': height + 'px',
-        '--w': width + 'px',
-        '--d': distance + 'px'
+        'line-height': this.height + 'px',
+        'height': this.height + 'px',
       }
     },
 
@@ -128,9 +136,31 @@ export default {
 
     coreStyle () {
       return {
-        'background-color': this.colorCurrent
+        'background-color': this.colorCurrent,
+        'height': this.height + 'px',
+        'width' : this.width + 'px',
+        'border-radius': this.borderRadius + 'px'
       }
-    }
+    },
+
+    controlStyle () {
+      const translateX = this.toggled ? this.distance : margin
+      const style = {
+        'height': this.height - 6 + 'px',
+        'width': this.height - 6 + 'px',
+        'border-radius': Math.round(this.borderRadius * ((this.height - 6) / this.height)) + 'px',
+        'transform': `translate(${translateX}px, ${margin}px)`
+      }
+      return style
+    },
+
+    labelStyle () {
+      return {
+        'line-height': this.height + 'px',
+        'height': this.height + 'px'
+      }
+    },
+
   },
   watch: {
     value (value) {
@@ -188,6 +218,7 @@ $margin: 3px;
       left: 10px;
     }
 
+//      width: $core-size;
     &.v-right {
       right: 10px;
     }
@@ -209,7 +240,7 @@ $margin: 3px;
 //    width: var(--toggle-width);
 //    height: $height;
 
-    &:before {
+    .v-switch-control {
       display: block;
       position: absolute;
       overflow: hidden;
@@ -225,18 +256,11 @@ $margin: 3px;
       transform: translate($margin, $margin);
       transition: transform .3s;
 
-      border-radius: 100%;
       background-color: #fff;
       content: '';
     }
   }
 
-  &.toggled {
-    .v-switch-core:before {
-      transform: translate(30px, $margin);
-      transform: translate(var(--d), $margin);
-    }
-  }
 
   &.disabled {
     pointer-events: none;
@@ -245,25 +269,4 @@ $margin: 3px;
   }
 }
 
-.vue-js-switch {
-  line-height: var(--h);
-  height: var(--h);
-
-  .v-switch-label {
-    line-height: var(--h);
-    height: var(--h);
-  }
-
-  .v-switch-core {
-    border-radius: 999px;
-    width: 50px;
-    width: var(--w);
-    height: var(--h);
-
-    &:before {
-      width: calc(var(--h) - 6px);
-      height: calc(var(--h) - 6px);
-    }
-  }
-}
 </style>

@@ -129,6 +129,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 //
 //
 //
+//
+//
 
 var DEF_CHECKED_COLOR = '#75C791';
 var DEF_UNCHEKED_COLOR = '#bfcbd9';
@@ -137,9 +139,6 @@ var DEF_CHECKED_LABEL = 'on';
 var DEF_UNCHECKED_LABEL = 'off';
 
 var margin = 3;
-// 11/25 = -.44
-// const DEFAULT_HEIGHT = 22
-// const DEFAULT_WIDTH = 50
 
 var contains = function contains(object, title) {
   return (typeof object === 'undefined' ? 'undefined' : _typeof(object)) === 'object' && object.hasOwnProperty(title);
@@ -180,6 +179,10 @@ var contains = function contains(object, title) {
     width: {
       type: Number,
       default: 50
+    },
+    borderRadius: {
+      type: Number,
+      default: 999
     }
   },
   computed: {
@@ -190,6 +193,9 @@ var contains = function contains(object, title) {
 
       return ['vue-js-switch', { toggled: toggled, disabled: disabled }];
     },
+    distance: function distance() {
+      return this.width - this.height + margin;
+    },
     ariaChecked: function ariaChecked() {
       return this.toggled.toString();
     },
@@ -197,12 +203,10 @@ var contains = function contains(object, title) {
       var width = this.width,
           height = this.height;
 
-      var distance = width - height + margin;
 
       return {
-        '--h': height + 'px',
-        '--w': width + 'px',
-        '--d': distance + 'px'
+        'line-height': this.height + 'px',
+        'height': this.height + 'px'
       };
     },
     colorChecked: function colorChecked() {
@@ -226,7 +230,26 @@ var contains = function contains(object, title) {
     },
     coreStyle: function coreStyle() {
       return {
-        'background-color': this.colorCurrent
+        'background-color': this.colorCurrent,
+        'height': this.height + 'px',
+        'width': this.width + 'px',
+        'border-radius': this.borderRadius + 'px'
+      };
+    },
+    controlStyle: function controlStyle() {
+      var translateX = this.toggled ? this.distance : margin;
+      var style = {
+        'height': this.height - 6 + 'px',
+        'width': this.height - 6 + 'px',
+        'border-radius': Math.round(this.borderRadius * ((this.height - 6) / this.height)) + 'px',
+        'transform': 'translate(' + translateX + 'px, ' + margin + 'px)'
+      };
+      return style;
+    },
+    labelStyle: function labelStyle() {
+      return {
+        'line-height': this.height + 'px',
+        'height': this.height + 'px'
       };
     }
   },
@@ -281,7 +304,7 @@ exports = module.exports = __webpack_require__(5)();
 
 
 // module
-exports.push([module.i, ".vue-js-switch[data-v-25adc6c0]{display:inline-block;position:relative;overflow:hidden;vertical-align:middle;user-select:none;font-size:10px;cursor:pointer}.vue-js-switch .v-switch-input[data-v-25adc6c0]{display:none}.vue-js-switch .v-switch-label[data-v-25adc6c0]{position:absolute;top:0;font-weight:600;color:#fff}.vue-js-switch .v-switch-label.v-left[data-v-25adc6c0]{left:10px}.vue-js-switch .v-switch-label.v-right[data-v-25adc6c0]{right:10px}.vue-js-switch .v-switch-core[data-v-25adc6c0]{margin:0;display:inline-block;position:relative;outline:0;box-sizing:border-box;background:#bfcbd9;transition:border-color .3s,background-color .3s;user-select:none}.vue-js-switch .v-switch-core[data-v-25adc6c0]:before{display:block;position:absolute;overflow:hidden;top:0;left:0;z-index:20;transform:translate(3px,3px);transition:transform .3s;border-radius:100%;background-color:#fff;content:\"\"}.vue-js-switch.toggled .v-switch-core[data-v-25adc6c0]:before{transform:translate(30px,3px);transform:translate(var(--d),3px)}.vue-js-switch.disabled[data-v-25adc6c0]{pointer-events:none;cursor:not-allowed;opacity:.6}.vue-js-switch .v-switch-label[data-v-25adc6c0],.vue-js-switch[data-v-25adc6c0]{line-height:var(--h);height:var(--h)}.vue-js-switch .v-switch-core[data-v-25adc6c0]{border-radius:999px;width:50px;width:var(--w);height:var(--h)}.vue-js-switch .v-switch-core[data-v-25adc6c0]:before{width:calc(var(--h) - 6px);height:calc(var(--h) - 6px)}", ""]);
+exports.push([module.i, ".vue-js-switch[data-v-25adc6c0]{display:inline-block;position:relative;overflow:hidden;vertical-align:middle;user-select:none;font-size:10px;cursor:pointer}.vue-js-switch .v-switch-input[data-v-25adc6c0]{display:none}.vue-js-switch .v-switch-label[data-v-25adc6c0]{position:absolute;top:0;font-weight:600;color:#fff}.vue-js-switch .v-switch-label.v-left[data-v-25adc6c0]{left:10px}.vue-js-switch .v-switch-label.v-right[data-v-25adc6c0]{right:10px}.vue-js-switch .v-switch-core[data-v-25adc6c0]{margin:0;display:inline-block;position:relative;outline:0;box-sizing:border-box;background:#bfcbd9;transition:border-color .3s,background-color .3s;user-select:none}.vue-js-switch .v-switch-core .v-switch-control[data-v-25adc6c0]{display:block;position:absolute;overflow:hidden;top:0;left:0;z-index:20;transform:translate(3px,3px);transition:transform .3s;background-color:#fff;content:\"\"}.vue-js-switch.disabled[data-v-25adc6c0]{pointer-events:none;cursor:not-allowed;opacity:.6}", ""]);
 
 // exports
 
@@ -427,10 +450,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "aria-checked": _vm.ariaChecked
     }
-  }), _vm._v(" "), (_vm.labels) ? _c('div', [(_vm.toggled) ? _c('span', {
-    staticClass: "v-switch-label v-left"
+  }, [_c('span', {
+    staticClass: "v-switch-control",
+    style: (_vm.controlStyle)
+  })]), _vm._v(" "), (_vm.labels) ? _c('div', [(_vm.toggled) ? _c('span', {
+    staticClass: "v-switch-label v-left",
+    style: (_vm.labelStyle)
   }, [_vm._v(_vm._s(_vm.labelChecked))]) : _c('span', {
-    staticClass: "v-switch-label v-right"
+    staticClass: "v-switch-label v-right",
+    style: (_vm.labelStyle)
   }, [_vm._v(_vm._s(_vm.labelUnchecked))])]) : _vm._e()])
 },staticRenderFns: []}
 
